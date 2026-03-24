@@ -1,0 +1,60 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://jabuti:jabuti_secret@db:5432/jabuti_db
+      - REDIS_URL=redis://cache:6379/0
+      - ENVIRONMENT=development
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+    networks:
+      - jabuti-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: fastapi-db
+    environment:
+      POSTGRES_USER: jabuti
+      POSTGRES_PASSWORD: jabuti_secret
+      POSTGRES_DB: jabuti_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jabuti -d jabuti_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jabuti-network
+
+  cache:
+    image: redis:7-alpine
+    container_name: fastapi-cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - jabuti-network
+
+volumes:
+  postgres_data:
+
+networks:
+  jabuti-network:
+    driver: bridge
