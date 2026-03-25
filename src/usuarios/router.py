@@ -71,12 +71,13 @@ async def atualizar_usuario(
 
 @router.delete(
     "/{usuario_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
     summary="Remover usuário",
     description="Remove um usuário pelo ID.",
 )
 async def remover_usuario(
     usuario_id: UUID,
     service: UsuarioService = Depends(get_usuario_service),
-) -> None:
+) -> dict:
     await service.delete(usuario_id)
+    return {"detail": "Usuário removido com sucesso"}

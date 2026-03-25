@@ -1,0 +1,1 @@
+docker compose exec db psql -U jabuti -d jabuti_db -c "SELECT count(*) FROM usuario;"
