@@ -104,6 +104,7 @@ async def get_all(self, *, limit: int, offset: int) -> UsuarioPaginatedResponse:
 ```
 
 Passo a passo:
+
 1. A chave é construída com os parâmetros da requisição (`limit=10:offset=0`)
 2. `self._cache.get(cache_key)` busca o valor no Redis → retorna `None` se não existir
 3. Se encontrou (string JSON), `model_validate_json()` converte de volta para objeto Pydantic
@@ -178,6 +179,7 @@ async def _invalidate_cache(self, usuario_id: UUID | None = None) -> None:
 O Redis armazena milhões de chaves. O comando `SCAN` percorre as chaves de forma **incremental** , sem bloquear o servidor (diferente do perigoso comando `KEYS`).
 
 `scan_iter("usuarios:all:*")` encontra todas as chaves que começam com `usuarios:all:`:
+
 - `usuarios:all:limit=10:offset=0`
 - `usuarios:all:limit=10:offset=10`
 - `usuarios:all:limit=20:offset=0`
@@ -266,6 +268,7 @@ Por padrão, o Redis retorna dados como `bytes` (`b'{"nome":"João"}'`). Com `de
 ## Fluxo Visual Completo
 
 ### GET /usuarios (primeira vez — CACHE MISS)
+
 ```
 Cliente ──GET──► Router ──► Service ──► Redis.get("usuarios:all:limit=10:offset=0")
                                               │
@@ -281,6 +284,7 @@ Cliente ──GET──► Router ──► Service ──► Redis.get("usuario
 ```
 
 ### GET /usuarios (segunda vez — CACHE HIT)
+
 ```
 Cliente ──GET──► Router ──► Service ──► Redis.get("usuarios:all:limit=10:offset=0")
                                               │
@@ -293,6 +297,7 @@ Cliente ──GET──► Router ──► Service ──► Redis.get("usuario
 ```
 
 ### POST /usuarios (cria + invalida)
+
 ```
 Cliente ──POST──► Router ──► Service ──► Repository.create() ──► PostgreSQL
                                               │

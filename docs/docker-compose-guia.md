@@ -7,11 +7,13 @@
 Docker é uma ferramenta que empacota sua aplicação junto com **tudo que ela precisa** (sistema operacional, bibliotecas, dependências) em uma unidade chamada **container**.
 
 Sem Docker:
+
 ```
 "Funciona na minha máquina" → instalar Python, pip, PostgreSQL, Redis, configurar tudo manualmente
 ```
 
 Com Docker:
+
 ```
 "docker compose up" → tudo roda igual em qualquer máquina
 ```
@@ -78,19 +80,25 @@ CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload
 ### Explicação linha por linha
 
 #### `FROM python:3.12-slim`
+
 A base da imagem. `slim` é uma versão enxuta do Debian com Python pré-instalado (~150MB vs ~900MB da versão full). Outras opções:
+
 - `python:3.12` — versão completa (maior, mais pacotes do sistema)
 - `python:3.12-alpine` — baseada em Alpine Linux (~50MB), mas pode ter problemas de compatibilidade
 
 #### `WORKDIR /app`
+
 Cria e define `/app` como diretório de trabalho. Todos os comandos subsequentes rodam neste diretório. É como fazer `cd /app`.
 
 #### `RUN apt-get update && ...`
+
 Executa comandos durante o **build** da imagem. Aqui instala `gcc` (compilador C), necessário para compilar a extensão C do `asyncpg` (driver PostgreSQL).
+
 - `--no-install-recommends` → não instala pacotes recomendados (reduz tamanho)
 - `rm -rf /var/lib/apt/lists/*` → limpa cache do apt (reduz tamanho)
 
 #### `COPY requirements.txt .` + `RUN pip install ...`
+
 **Otimização de cache de build**: Copiando APENAS o `requirements.txt` antes do resto do código, o Docker **cacheia** a instalação de dependências. Se você mudar o código (mas não as dependências), o Docker reutiliza a camada do `pip install` — rebuild muito mais rápido.
 
 ```
@@ -102,10 +110,13 @@ Camada 5: COPY . .                         ← RECONSTRUÍDA (código mudou)
 ```
 
 #### `EXPOSE 8000`
+
 Apenas **documentação** — declara que o container escuta na porta 8000. Não abre a porta automaticamente (isso é feito no `docker-compose.yml` com `ports`).
 
 #### `CMD ["uvicorn", "src.main:app", ...]`
+
 Comando padrão quando o container inicia. Usa formato **exec** (array JSON) ao invés de shell — mais seguro, sinais do SO chegam diretamente ao processo.
+
 - `--host 0.0.0.0` → escuta em todas as interfaces (necessário dentro do container)
 - `--port 8000` → porta interna do container
 - `--reload` → hot-reload em desenvolvimento (reinicia quando código muda)
@@ -213,6 +224,7 @@ environment:
 Variáveis de ambiente são injetadas dentro do container. O `pydantic-settings` as lê automaticamente em `config.py`.
 
 Detalhe importante na URL do banco:
+
 ```
 postgresql+asyncpg://jabuti:jabuti_secret@db:5432/jabuti_db
                                           ^^
@@ -249,6 +261,7 @@ healthcheck:
 ```
 
 Sequência de startup:
+
 ```
 1. db inicia       ─── healthcheck verifica ──── "pg_isready" retorna OK ✓
 2. cache inicia    ─── healthcheck verifica ──── "redis-cli ping" retorna PONG ✓
@@ -296,6 +309,7 @@ Seu computador          Container
 Quando você edita `src/main.py` no VS Code, a mudança aparece **instantaneamente** dentro do container. Combinado com `--reload` do Uvicorn, o servidor reinicia automaticamente. É o que permite **hot-reload** em desenvolvimento.
 
 **Diferença volume vs bind mount**:
+
 - **Volume nomeado** (`postgres_data:/var/lib/...`): gerenciado pelo Docker, bom para dados que devem persistir
 - **Bind mount** (`./src:/app/src`): espelha pasta do host, bom para desenvolvimento
 
@@ -321,6 +335,7 @@ Outros containers (de outros projetos) NÃO acessam esta rede.
 ```
 
 O **driver bridge** é o padrão — cria uma rede local virtual. Alternativas:
+
 - `host`: container usa a rede do host diretamente (sem isolamento)
 - `overlay`: para clusters Docker Swarm (múltiplas máquinas)
 
@@ -398,6 +413,7 @@ db:
 ### 1. Multi-stage? Não necessário
 
 Para APIs Python simples, um Dockerfile single-stage com `slim` é suficiente. Multi-stage é mais útil quando:
+
 - Há etapa de compilação pesada (ex: frontend React)
 - A imagem final pode ser significativamente menor sem ferramentas de build
 

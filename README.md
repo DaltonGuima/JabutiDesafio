@@ -56,14 +56,15 @@ docker compose up --build
 ```
 
 Isso irá iniciar 3 containers:
+
 - **app** — FastAPI na porta `8000`
 - **db** — PostgreSQL na porta `5432`
 - **cache** — Redis na porta `6379`
 
 ### Acessar a documentação
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- Swagger UI: <http://localhost:8000/docs>
+- ReDoc: <http://localhost:8000/redoc>
 
 ## Cache (Redis)
 

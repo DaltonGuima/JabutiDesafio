@@ -20,6 +20,7 @@ Este guia mapeia conceitos que você já conhece de Java/Spring Boot para os equ
 ## Controller → Router
 
 ### Java (Spring Boot)
+
 ```java
 @RestController
 @RequestMapping("/usuarios")
@@ -49,6 +50,7 @@ public class UsuarioController {
 ```
 
 ### Python (FastAPI)
+
 ```python
 router = APIRouter()
 
@@ -93,6 +95,7 @@ async def criar_usuario(
 ## DTO → Pydantic Schema
 
 ### Java
+
 ```java
 // DTO de entrada
 public record UsuarioCreateDTO(
@@ -111,6 +114,7 @@ public record UsuarioDTO(
 ```
 
 ### Python (Pydantic)
+
 ```python
 class UsuarioBase(BaseModel):
     nome: str = Field(..., min_length=1, max_length=255)
@@ -159,6 +163,7 @@ for field, value in update_data.items():
 ## Entity → SQLAlchemy Model
 
 ### Java (JPA/Hibernate)
+
 ```java
 @Entity
 @Table(name = "usuario")
@@ -180,6 +185,7 @@ public class Usuario {
 ```
 
 ### Python (SQLAlchemy 2.0)
+
 ```python
 class Usuario(Base):
     __tablename__ = "usuario"
@@ -209,6 +215,7 @@ class Usuario(Base):
 ## Repository Pattern
 
 ### Java (Spring Data JPA)
+
 ```java
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
@@ -217,6 +224,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 ```
 
 ### Python (SQLAlchemy manual)
+
 ```python
 class UsuarioRepository:
     def __init__(self, session: AsyncSession) -> None:
@@ -255,6 +263,7 @@ Note que o Repository usa `flush()` e não `commit()`. O commit é feito pelo `g
 ## Injeção de Dependência
 
 ### Java (Spring)
+
 ```java
 @Service
 public class UsuarioService {
@@ -270,6 +279,7 @@ public class UsuarioService {
 O Spring escaneia `@Component`, `@Service`, `@Repository` e injeta automaticamente.
 
 ### Python (FastAPI Depends)
+
 ```python
 # Não há container IoC global — a composição é explícita
 
@@ -298,6 +308,7 @@ async def get_usuario_service(
 ## Exceções e Error Handling
 
 ### Java
+
 ```java
 // Exceção customizada
 @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -318,6 +329,7 @@ public class GlobalExceptionHandler {
 ```
 
 ### Python (FastAPI)
+
 ```python
 class UsuarioNaoEncontrado(HTTPException):
     def __init__(self) -> None:
@@ -345,6 +357,7 @@ raise UsuarioNaoEncontrado()  # FastAPI captura e retorna JSON automático
 ## Async/Await — Concorrência
 
 ### Java
+
 ```java
 // Java usa threads (Spring MVC padrão) ou reativo (WebFlux)
 @GetMapping
@@ -354,6 +367,7 @@ public Mono<List<UsuarioDTO>> listar() {    // WebFlux (reativo)
 ```
 
 ### Python
+
 ```python
 @router.get("")
 async def listar_usuarios(...) -> UsuarioPaginatedResponse:
@@ -374,6 +388,7 @@ Python usa um **event loop** único (como Node.js). Enquanto uma operação de I
 ## Cache com Redis
 
 ### Java (Spring Cache)
+
 ```java
 @Service
 public class UsuarioService {
@@ -393,6 +408,7 @@ public class UsuarioService {
 Spring Cache usa **anotações declarativas** — o framework cuida de tudo.
 
 ### Python (Redis manual)
+
 ```python
 class UsuarioService:
     async def get_by_id(self, usuario_id: UUID) -> UsuarioResponse:
@@ -431,6 +447,7 @@ O FastAPI não tem equivalente ao `@Cacheable` do Spring. O cache é implementad
 ## Configuração
 
 ### Java (application.yml)
+
 ```yaml
 spring:
   datasource:
@@ -443,6 +460,7 @@ spring:
 ```
 
 ### Python (pydantic-settings)
+
 ```python
 class Settings(BaseSettings):
     DATABASE_URL: str           # Lê de env var automaticamente

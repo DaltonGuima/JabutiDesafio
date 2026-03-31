@@ -21,6 +21,7 @@
 | 1 | `GET` | `/health` | Verificação de saúde da API | 200 | 200 | PASS |
 
 **Response:**
+
 ```json
 {"status": "ok"}
 ```
@@ -36,10 +37,13 @@
 | 4 | `POST` | `/usuarios` | Body com dados inválidos (nome vazio, email inválido, idade negativa) | 422 | 422 | PASS |
 
 **Teste 2 — Request:**
+
 ```json
 {"nome": "Maria Souza", "email": "maria@email.com", "idade": 25}
 ```
+
 **Response (201):**
+
 ```json
 {
   "nome": "Maria Souza",
@@ -50,11 +54,13 @@
 ```
 
 **Teste 3 — Email duplicado (409):**
+
 ```json
 {"detail": "Email já cadastrado"}
 ```
 
 **Teste 4 — Validação Pydantic (422):**
+
 ```json
 {
   "detail": [
@@ -76,6 +82,7 @@
 | 7 | `GET` | `/usuarios?limit=1&offset=1` | Página 2 (1 item) | 200 | 200 | PASS |
 
 **Teste 5 — Listagem completa (200):**
+
 ```json
 {
   "items": [
@@ -89,6 +96,7 @@
 ```
 
 **Teste 6 — Paginação limit=1, offset=0 (200):**
+
 ```json
 {
   "items": [{"nome": "Carlos Silva", "email": "carlos@email.com", "idade": 30, "id": "e763f3d6-..."}],
@@ -99,6 +107,7 @@
 ```
 
 **Teste 7 — Paginação limit=1, offset=1 (200):**
+
 ```json
 {
   "items": [{"nome": "Maria Souza", "email": "maria@email.com", "idade": 25, "id": "c6566c4f-..."}],
@@ -118,6 +127,7 @@
 | 9 | `GET` | `/usuarios/{id}` | Buscar ID inexistente | 404 | 404 | PASS |
 
 **Teste 8 — Detalhe (200):**
+
 ```json
 {
   "nome": "Carlos Silva",
@@ -128,6 +138,7 @@
 ```
 
 **Teste 9 — Não encontrado (404):**
+
 ```json
 {"detail": "Usuário não encontrado"}
 ```
@@ -143,17 +154,20 @@
 | 12 | `PUT` | `/usuarios/{id}` | Atualizar ID inexistente | 404 | 404 | PASS |
 
 **Teste 10 — Atualização parcial (200):**
+
 ```
 Request:  {"nome": "Carlos Atualizado", "idade": 31}
 Response: {"nome": "Carlos Atualizado", "email": "carlos@email.com", "idade": 31, "id": "e763f3d6-..."}
 ```
 
 **Teste 11 — Email duplicado no update (409):**
+
 ```json
 {"detail": "Email já cadastrado"}
 ```
 
 **Teste 12 — ID inexistente no update (404):**
+
 ```json
 {"detail": "Usuário não encontrado"}
 ```
@@ -171,6 +185,7 @@ Response: {"nome": "Carlos Atualizado", "email": "carlos@email.com", "idade": 31
 **Teste 13 — Remoção bem-sucedida:** Status `204 No Content` (sem body)
 
 **Teste 14/15 — Já removido / inexistente (404):**
+
 ```json
 {"detail": "Usuário não encontrado"}
 ```
